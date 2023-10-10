@@ -1,0 +1,29 @@
+{
+  "seq": 16,
+  "error": 0,
+  "data": {
+    "switches": [
+      { "switch": "off", "outlet": 0 },
+      { "switch": "off", "outlet": 1 },
+      { "switch": "off", "outlet": 2 },
+      { "switch": "off", "outlet": 3 }
+    ],
+    "configure": [
+      { "startup": "off", "outlet": 0 },
+      { "startup": "off", "outlet": 1 },
+      { "startup": "off", "outlet": 2 },
+      { "startup": "off", "outlet": 3 }
+    ],
+    "pulses": [
+      { "pulse": "off", "switch": "off", "outlet": 0, "width": 0 },
+      { "pulse": "off", "switch": "off", "outlet": 1, "width": 0 },
+      { "pulse": "off", "switch": "off", "outlet": 2, "width": 0 },
+      { "pulse": "off", "switch": "off", "outlet": 3, "width": 0 }
+    ],
+    "sledOnline": "on",
+    "fwVersion": "1.4.3",
+    "staMac": "B4:E8:42:FF:60:B6",
+    "rssi": -34,
+    "bssid": "50:ff:20:9d:eb:9a"
+  }
+}
