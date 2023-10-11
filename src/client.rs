@@ -23,7 +23,7 @@ impl Client {
     pub fn new<H: Into<String>>(host: H, port: u16) -> Self {
         Client {
             host: host.into(),
-            port: port.into(),
+            port,
             inner: reqwest::Client::default(),
         }
     }

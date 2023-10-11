@@ -1,9 +1,9 @@
 [package]
 name = "sonoff-minir3"
-version = "0.1.0"
+version = "0.1.0"  # VERSION_ANCHOR
 edition = "2021"
 authors = ["Nikita Sivakov <sivakov512@icloud.com>"]
-license-file = "LICENSE"
+license = "MIT"
 description = "Sonoff mini R3 API client"
 repository = "https://github.com/sivakov512/sonoff-minir3-rs"
 readme = "README.md"

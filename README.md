@@ -1,6 +1,6 @@
 # Sonoff mini R3
 
-[![Build status](https://github.com/sivakov512/sonoff-minir3-rs/actions/workflows/test.yml/badge.svg)](https://github.com/sivakov512/sonoff-minir3-rs/actions/workflows/test.yml)
+[![Build status](https://github.com/sivakov512/sonoff-minir3-rs/actions/workflows/test.yaml/badge.svg)](https://github.com/sivakov512/sonoff-minir3-rs/actions/workflows/test.yaml)
 [![Downloads](https://img.shields.io/crates/d/sonoff-minir3.svg)](https://crates.io/crates/sonoff-minir3)
 [![API Docs](https://docs.rs/sonoff-minir3/badge.svg)](https://docs.rs/sonoff-minir3)
 [![LICENSE](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
