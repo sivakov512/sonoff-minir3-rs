@@ -2,8 +2,11 @@
 name = "sonoff-minir3"
 version = "0.1.0"
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+authors = ["Nikita Sivakov <sivakov512@icloud.com>"]
+license-file = "LICENSE"
+description = "Sonoff mini R3 API client"
+repository = "https://github.com/sivakov512/sonoff-minir3-rs"
+readme = "README.md"
 
 [dependencies]
 anyhow = "1.0"

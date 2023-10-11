@@ -3,8 +3,9 @@
 //! This crate provides a high-level client for official Sonoff mini R3 DIY API.
 //!
 //! Note that before using this library you should enter your device into DIY mode. More details on
-//! how to do that in [official documentation](https://sonoff.tech/diy-developer/).
-//! Also you always can read documentation for device API which is also [officialy presented](https://sonoff.tech/diy-developer/)
+//! how to do that can be found in [official documentation](https://sonoff.tech/diy-developer/).
+//! Also you may need to read [API documentation](https://sonoff.tech/diy-developer/) which is used
+//! to implement this lib.
 //!
 //! Currently library provides limited amount of features:
 //! - fetching device info (only few attributes)
