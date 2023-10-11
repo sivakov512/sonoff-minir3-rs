@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
 
+const OUTLET2USE: u8 = 0;
+
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum SwitchPosition {
@@ -28,14 +30,14 @@ impl From<InfoResponse> for Info {
                 .data
                 .switches
                 .into_iter()
-                .find(|s| s.outlet == 0)
+                .find(|s| s.outlet == OUTLET2USE)
                 .unwrap()
                 .switch,
             startup: value
                 .data
                 .configure
                 .into_iter()
-                .find(|s| s.outlet == 0)
+                .find(|s| s.outlet == OUTLET2USE)
                 .unwrap()
                 .startup,
         }
@@ -53,7 +55,7 @@ struct InfoData {
     configure: Vec<Startup>,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 struct Switch {
     switch: SwitchPosition,
     outlet: u8,
@@ -69,7 +71,7 @@ impl From<StartupPosition> for StartupsRequest {
     fn from(value: StartupPosition) -> Self {
         let mut startups = vec![Startup {
             startup: value,
-            outlet: 0,
+            outlet: OUTLET2USE,
         }];
 
         for i in 1..=3 {
@@ -95,4 +97,27 @@ pub(crate) struct StartupsRequest {
 #[derive(Serialize)]
 struct StartupsData {
     configure: Vec<Startup>,
+}
+
+impl From<SwitchPosition> for SwitchesRequest {
+    fn from(value: SwitchPosition) -> Self {
+        SwitchesRequest {
+            data: SwitchesData {
+                switches: vec![Switch {
+                    switch: value,
+                    outlet: OUTLET2USE,
+                }],
+            },
+        }
+    }
+}
+
+#[derive(Serialize)]
+pub(crate) struct SwitchesRequest {
+    data: SwitchesData,
+}
+
+#[derive(Serialize)]
+struct SwitchesData {
+    switches: Vec<Switch>,
 }

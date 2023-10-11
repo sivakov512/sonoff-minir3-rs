@@ -43,6 +43,15 @@ impl Client {
             .await?;
         Ok(())
     }
+
+    pub async fn set_switch_position(&self, position: SwitchPosition) -> anyhow::Result<()> {
+        self.inner
+            .post(self.url("switches"))
+            .json(&SwitchesRequest::from(position))
+            .send()
+            .await?;
+        Ok(())
+    }
 }
 
 #[cfg(test)]
@@ -88,7 +97,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn set_startup_sent_expected_request() {
+    async fn set_startup_position_sent_expected_request() {
         let (server, client) = make_server_and_client();
         let mock = server.mock(|when, then| {
             when.method("POST")
@@ -100,6 +109,25 @@ mod tests {
         });
 
         let got = client.set_startup_position(StartupPosition::Stay).await;
+
+        mock.assert();
+
+        assert!(got.is_ok());
+    }
+
+    #[tokio::test]
+    async fn set_switch_position_sent_expected_request() {
+        let (server, client) = make_server_and_client();
+        let mock = server.mock(|when, then| {
+            when.method("POST")
+                .path("/zeroconf/switches")
+                .body(load_fixture("request_switches_ok.json"));
+            then.status(200)
+                .header("content-type", "application/json; charset=utf-8")
+                .body(load_fixture("response_ok.json"));
+        });
+
+        let got = client.set_switch_position(SwitchPosition::On).await;
 
         mock.assert();
 
