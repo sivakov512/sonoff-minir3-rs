@@ -6,8 +6,21 @@ pub struct Client {
     inner: reqwest::Client,
 }
 
+/// An aynchronous client for Sonoff mini R3 API
+///
+/// For more details look at the official docs:
+/// https://sonoff.tech/sonoff-diy-developer-documentation-minir3-http-api/
 impl Client {
-    pub fn new<H: Into<String>, P: Into<u16>>(host: H, port: P) -> Self {
+    /// Constructs a new `Client` with given host and port
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// # use sonoff_minir3::Client;
+    ///
+    /// let client = Client::new("192.168.1.75", 8081);
+    /// ```
+    pub fn new<H: Into<String>>(host: H, port: u16) -> Self {
         Client {
             host: host.into(),
             port: port.into(),
@@ -23,6 +36,25 @@ impl Client {
         )
     }
 
+    /// Fetch device info.
+    ///
+    /// In current implementation it always uses `/zeroconf/info` API and returns limited info. For
+    /// more details take a look at `Info` struct.
+    ///
+    /// # Example
+    ///
+    /// ```ignore
+    /// let got = client.fetch_info().await;
+    ///
+    /// assert!(got.is_ok());
+    /// assert_eq!(
+    ///     got.unwrap(),
+    ///     Info {
+    ///         switch: SwitchPosition::Off,
+    ///         startup: StartupPosition::Off
+    ///     }
+    /// )
+    /// ```
     pub async fn fetch_info(&self) -> anyhow::Result<Info> {
         Ok(self
             .inner
@@ -35,6 +67,19 @@ impl Client {
             .try_into()?)
     }
 
+    /// Set startup position for device.
+    ///
+    /// It uses `/zeroconf/startups` API and always sets given position only for outlet 0.
+    /// Other outlets will be set to `off` on every call, because API doesn't allow to specify
+    /// state for one outlet only.
+    ///
+    /// # Example
+    ///
+    /// ```ignore
+    /// let got = client.set_startup_position(StartupPosition::Stay).await;
+    ///
+    /// assert!(got.is_ok());
+    /// ```
     pub async fn set_startup_position(&self, position: StartupPosition) -> anyhow::Result<()> {
         Ok(self
             .inner
@@ -47,6 +92,21 @@ impl Client {
             .try_into()?)
     }
 
+    /// Set switch position.
+    ///
+    /// Is uses `/zeroconf/switches` API and always sets given position for outlet 0 only. This API
+    /// allows to ignore state of another outlets, so they will be ignored.
+    ///
+    /// # Example
+    /// ```ignore
+    /// let got = client.set_switch_position(SwitchPosition::On).await;
+    ///
+    /// assert!(got.is_err());
+    /// assert_eq!(
+    ///     got.unwrap_err().downcast::<Error>().unwrap(),
+    ///     Error::WrongParameters
+    /// )
+    /// ```
     pub async fn set_switch_position(&self, position: SwitchPosition) -> anyhow::Result<()> {
         Ok(self
             .inner

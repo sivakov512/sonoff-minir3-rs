@@ -3,6 +3,9 @@ use std::fmt;
 
 const OUTLET2USE: u8 = 0;
 
+/// Represent errors that might be returned by device API.
+///
+/// Currently only code 400 is supported, presented as `WrongParameters`
 #[derive(Debug, Clone, PartialEq)]
 pub enum Error {
     WrongParameters,
@@ -28,6 +31,7 @@ impl fmt::Display for Error {
 
 impl std::error::Error for Error {}
 
+/// Represents switch position.
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum SwitchPosition {
@@ -35,6 +39,9 @@ pub enum SwitchPosition {
     Off,
 }
 
+/// Represents switch position on device startup.
+///
+/// `Stay` means that device will use last known position on startup.
 #[derive(Debug, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum StartupPosition {
@@ -55,6 +62,11 @@ struct Startup {
     outlet: u8,
 }
 
+/// Represents device info.
+///
+/// Currently only limited amount of details are supported.
+/// `switch` - current switch position on outlet 0
+/// `startup` - switch position on startup on outlet 0
 #[derive(Debug, PartialEq)]
 pub struct Info {
     pub switch: SwitchPosition,

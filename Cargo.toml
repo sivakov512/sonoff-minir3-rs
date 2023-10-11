@@ -1,5 +1,5 @@
 [package]
-name = "sonoff-minir3-rs"
+name = "sonoff-minir3"
 version = "0.1.0"
 edition = "2021"
 
