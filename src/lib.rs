@@ -26,31 +26,39 @@ impl Client {
     }
 
     pub async fn fetch_info(&self) -> anyhow::Result<Info> {
-        let res = self
+        Ok(self
             .inner
             .post(self.url("info"))
             .body("{\"data\":{}}")
             .send()
-            .await?;
-        Ok(res.json::<InfoResponse>().await?.into())
+            .await?
+            .json::<InfoResponse>()
+            .await?
+            .try_into()?)
     }
 
     pub async fn set_startup_position(&self, position: StartupPosition) -> anyhow::Result<()> {
-        self.inner
+        Ok(self
+            .inner
             .post(self.url("startups"))
             .json(&StartupsRequest::from(position))
             .send()
-            .await?;
-        Ok(())
+            .await?
+            .json::<EmptyResponse>()
+            .await?
+            .try_into()?)
     }
 
     pub async fn set_switch_position(&self, position: SwitchPosition) -> anyhow::Result<()> {
-        self.inner
+        Ok(self
+            .inner
             .post(self.url("switches"))
             .json(&SwitchesRequest::from(position))
             .send()
-            .await?;
-        Ok(())
+            .await?
+            .json::<EmptyResponse>()
+            .await?
+            .try_into()?)
     }
 }
 
@@ -70,67 +78,129 @@ mod tests {
         (server, client)
     }
 
-    #[tokio::test]
-    async fn info_returns_expected_result() {
-        let (server, client) = make_server_and_client();
-        let mock = server.mock(|when, then| {
-            when.method("POST")
-                .path("/zeroconf/info")
-                .body("{\"data\":{}}");
-            then.status(200)
-                .header("content-type", "application/json; charset=utf-8")
-                .body(load_fixture("response_info_ok.json"));
-        });
+    mod info {
+        use super::*;
 
-        let got = client.fetch_info().await;
+        #[tokio::test]
+        async fn returns_expected_result() {
+            let (server, client) = make_server_and_client();
+            let mock = server.mock(|when, then| {
+                when.method("POST")
+                    .path("/zeroconf/info")
+                    .body("{\"data\":{}}");
+                then.status(200)
+                    .header("content-type", "application/json; charset=utf-8")
+                    .body(load_fixture("response_info_ok.json"));
+            });
 
-        mock.assert();
+            let got = client.fetch_info().await;
 
-        assert!(got.is_ok());
-        assert_eq!(
-            got.unwrap(),
-            Info {
-                switch: SwitchPosition::Off,
-                startup: StartupPosition::Off
-            }
-        )
+            mock.assert();
+
+            assert!(got.is_ok());
+            assert_eq!(
+                got.unwrap(),
+                Info {
+                    switch: SwitchPosition::Off,
+                    startup: StartupPosition::Off
+                }
+            )
+        }
+
+        #[tokio::test]
+        async fn errored_in_expected_way() {
+            let (server, client) = make_server_and_client();
+            let mock = server.mock(|when, then| {
+                when.method("POST")
+                    .path("/zeroconf/info")
+                    .body("{\"data\":{}}");
+                then.status(400)
+                    .header("content-type", "application/json; charset=utf-8")
+                    .body(load_fixture("response_error.json"));
+            });
+
+            let got = client.fetch_info().await;
+
+            mock.assert();
+
+            assert!(got.is_err());
+            assert_eq!(
+                got.unwrap_err().downcast::<Error>().unwrap(),
+                Error::WrongParameters
+            )
+        }
     }
 
-    #[tokio::test]
-    async fn set_startup_position_sent_expected_request() {
-        let (server, client) = make_server_and_client();
-        let mock = server.mock(|when, then| {
-            when.method("POST")
-                .path("/zeroconf/startups")
-                .body(load_fixture("request_startups_ok.json"));
-            then.status(200)
-                .header("content-type", "application/json; charset=utf-8")
-                .body(load_fixture("response_ok.json"));
-        });
+    mod set_startup_position {
+        use super::*;
 
-        let got = client.set_startup_position(StartupPosition::Stay).await;
+        #[tokio::test]
+        async fn sent_expected_request() {
+            let (server, client) = make_server_and_client();
+            let mock = server.mock(|when, then| {
+                when.method("POST")
+                    .path("/zeroconf/startups")
+                    .body(load_fixture("request_startups_ok.json"));
+                then.status(200)
+                    .header("content-type", "application/json; charset=utf-8")
+                    .body(load_fixture("response_ok.json"));
+            });
 
-        mock.assert();
+            let got = client.set_startup_position(StartupPosition::Stay).await;
 
-        assert!(got.is_ok());
+            mock.assert();
+
+            assert!(got.is_ok());
+        }
+
+        #[tokio::test]
+        async fn errored_in_expected_way() {
+            let (server, client) = make_server_and_client();
+            let mock = server.mock(|when, then| {
+                when.method("POST")
+                    .path("/zeroconf/startups")
+                    .body(load_fixture("request_startups_ok.json"));
+                then.status(400)
+                    .header("content-type", "application/json; charset=utf-8")
+                    .body(load_fixture("response_error.json"));
+            });
+
+            let got = client.set_startup_position(StartupPosition::Stay).await;
+
+            mock.assert();
+
+            assert!(got.is_err());
+            assert_eq!(
+                got.unwrap_err().downcast::<Error>().unwrap(),
+                Error::WrongParameters
+            )
+        }
     }
 
-    #[tokio::test]
-    async fn set_switch_position_sent_expected_request() {
-        let (server, client) = make_server_and_client();
-        let mock = server.mock(|when, then| {
-            when.method("POST")
-                .path("/zeroconf/switches")
-                .body(load_fixture("request_switches_ok.json"));
-            then.status(200)
-                .header("content-type", "application/json; charset=utf-8")
-                .body(load_fixture("response_ok.json"));
-        });
+    mod set_switch_position {
+        use super::*;
 
-        let got = client.set_switch_position(SwitchPosition::On).await;
+        #[tokio::test]
+        async fn sent_expected_request() {
+            let (server, client) = make_server_and_client();
+            let mock = server.mock(|when, then| {
+                when.method("POST")
+                    .path("/zeroconf/switches")
+                    .body(load_fixture("request_switches_ok.json"));
+                then.status(400)
+                    .header("content-type", "application/json; charset=utf-8")
+                    .body(load_fixture("response_error.json"));
+            });
 
-        mock.assert();
+            let got = client.set_switch_position(SwitchPosition::On).await;
 
-        assert!(got.is_ok());
+            mock.assert();
+
+            assert!(got.is_err());
+            assert_eq!(
+                got.unwrap_err().downcast::<Error>().unwrap(),
+                Error::WrongParameters
+            )
+        }
     }
 }
