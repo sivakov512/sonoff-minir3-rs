@@ -44,11 +44,11 @@ impl From<InfoResponse> for Info {
 
 #[derive(Deserialize)]
 pub(crate) struct InfoResponse {
-    data: Data,
+    data: InfoData,
 }
 
 #[derive(Deserialize)]
-struct Data {
+struct InfoData {
     switches: Vec<Switch>,
     configure: Vec<Startup>,
 }
@@ -59,8 +59,40 @@ struct Switch {
     outlet: u8,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Serialize)]
 struct Startup {
     startup: StartupPosition,
     outlet: u8,
+}
+
+impl From<StartupPosition> for StartupsRequest {
+    fn from(value: StartupPosition) -> Self {
+        let mut startups = vec![Startup {
+            startup: value,
+            outlet: 0,
+        }];
+
+        for i in 1..=3 {
+            startups.push(Startup {
+                startup: StartupPosition::Off,
+                outlet: i,
+            })
+        }
+
+        Self {
+            data: StartupsData {
+                configure: startups,
+            },
+        }
+    }
+}
+
+#[derive(Serialize)]
+pub(crate) struct StartupsRequest {
+    data: StartupsData,
+}
+
+#[derive(Serialize)]
+struct StartupsData {
+    configure: Vec<Startup>,
 }

@@ -1,0 +1,10 @@
+{
+  "data": {
+    "configure": [
+      { "startup": "stay", "outlet": 0 },
+      { "startup": "off", "outlet": 1 },
+      { "startup": "off", "outlet": 2 },
+      { "startup": "off", "outlet": 3 }
+    ]
+  }
+}
