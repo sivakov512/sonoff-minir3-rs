@@ -43,10 +43,34 @@ pub enum StartupPosition {
     Stay,
 }
 
+#[derive(Deserialize, Serialize)]
+struct Switch {
+    switch: SwitchPosition,
+    outlet: u8,
+}
+
+#[derive(Deserialize, Serialize)]
+struct Startup {
+    startup: StartupPosition,
+    outlet: u8,
+}
+
 #[derive(Debug, PartialEq)]
 pub struct Info {
     pub switch: SwitchPosition,
     pub startup: StartupPosition,
+}
+
+#[derive(Deserialize)]
+pub(crate) struct InfoResponse {
+    data: Option<InfoData>,
+    error: usize,
+}
+
+#[derive(Deserialize)]
+struct InfoData {
+    switches: Vec<Switch>,
+    configure: Vec<Startup>,
 }
 
 impl TryFrom<InfoResponse> for Info {
@@ -76,28 +100,14 @@ impl TryFrom<InfoResponse> for Info {
     }
 }
 
-#[derive(Deserialize)]
-pub(crate) struct InfoResponse {
-    data: Option<InfoData>,
-    error: usize,
+#[derive(Serialize)]
+pub(crate) struct StartupsRequest {
+    data: StartupsData,
 }
 
-#[derive(Deserialize)]
-struct InfoData {
-    switches: Vec<Switch>,
+#[derive(Serialize)]
+struct StartupsData {
     configure: Vec<Startup>,
-}
-
-#[derive(Deserialize, Serialize)]
-struct Switch {
-    switch: SwitchPosition,
-    outlet: u8,
-}
-
-#[derive(Deserialize, Serialize)]
-struct Startup {
-    startup: StartupPosition,
-    outlet: u8,
 }
 
 impl From<StartupPosition> for StartupsRequest {
@@ -123,13 +133,13 @@ impl From<StartupPosition> for StartupsRequest {
 }
 
 #[derive(Serialize)]
-pub(crate) struct StartupsRequest {
-    data: StartupsData,
+pub(crate) struct SwitchesRequest {
+    data: SwitchesData,
 }
 
 #[derive(Serialize)]
-struct StartupsData {
-    configure: Vec<Startup>,
+struct SwitchesData {
+    switches: Vec<Switch>,
 }
 
 impl From<SwitchPosition> for SwitchesRequest {
@@ -145,14 +155,9 @@ impl From<SwitchPosition> for SwitchesRequest {
     }
 }
 
-#[derive(Serialize)]
-pub(crate) struct SwitchesRequest {
-    data: SwitchesData,
-}
-
-#[derive(Serialize)]
-struct SwitchesData {
-    switches: Vec<Switch>,
+#[derive(Deserialize)]
+pub(crate) struct EmptyResponse {
+    error: usize,
 }
 
 impl TryFrom<EmptyResponse> for () {
@@ -164,9 +169,4 @@ impl TryFrom<EmptyResponse> for () {
             v => Err(Error::from_api_error_code(v)),
         }
     }
-}
-
-#[derive(Deserialize)]
-pub(crate) struct EmptyResponse {
-    error: usize,
 }
