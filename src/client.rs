@@ -24,7 +24,10 @@ impl Client {
         Client {
             host: host.into(),
             port,
-            inner: reqwest::Client::default(),
+            inner: reqwest::Client::builder()
+                .http1_title_case_headers()
+                .build()
+                .unwrap(),
         }
     }
 
