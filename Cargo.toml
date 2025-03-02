@@ -20,4 +20,4 @@ trust-dns-resolver = "0.23.2"
 async-std = { version = "1.12", features = ["attributes"] }
 httpmock = "0.7"
 jsonxf = "1.1"
-rstest = "0.21.0"
+rstest = "0.25.0"
